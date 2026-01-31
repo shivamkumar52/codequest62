@@ -16,6 +16,31 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Validate email is a string
+    if (typeof email !== 'string') {
+      return NextResponse.json(
+        { error: 'Email must be a valid email address' },
+        { status: 400 }
+      )
+    }
+
+    // Validate password is a string
+    if (typeof password !== 'string') {
+      return NextResponse.json(
+        { error: 'Password is required' },
+        { status: 400 }
+      )
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+      return NextResponse.json(
+        { error: 'Invalid email format' },
+        { status: 400 }
+      )
+    }
+
     // Check if user already exists
     const existingUser = await db.user.findUnique({
       where: { email }
@@ -49,11 +74,19 @@ export async function POST(request: NextRequest) {
     })
 
     // Send welcome email to user
-    const welcomeEmailResult = await sendThankYouEmail(user.email, user.name || user.email.split('@')[0], user.id)
+    const welcomeEmailResult = await sendThankYouEmail(
+      user.email,
+      user.name || user.email.split('@')[0],
+      user.id
+    )
 
     // Send notification to admin about new user signup
     if (email !== 'shivta6200@gmail.com') {
-      await sendAdminSignInNotification(user.name || user.email.split('@')[0], user.email, user.id)
+      await sendAdminSignInNotification(
+        user.name || user.email.split('@')[0],
+        user.email,
+        user.id
+      )
     }
 
     // Return user without password
