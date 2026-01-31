@@ -53,33 +53,12 @@ export default function SignInPage() {
     }
 
     try {
-      setDebugInfo('Calling API...')
+      setDebugInfo('Calling AuthContext signIn...')
       
-      const response = await fetch('/api/auth/signin', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name: name.trim(),
-          email: email.trim(),
-        }),
-      })
-
-      setDebugInfo('Response received: ' + response.status)
-      console.log('Response status:', response.status)
-
-      const data = await response.json()
-      console.log('Response data:', data)
-
-      if (!response.ok) {
-        setError(data.error || 'Failed to sign in')
-        setDebugInfo('API Error: ' + data.error)
-        setLoading(false)
-        return
-      }
-
-      signIn(data.user)
+      // ✅ CORRECT - Call AuthContext's signIn with just the email string
+      await signIn(email.trim())
+      
+      setDebugInfo('Sign in successful!')
       router.push('/courses')
     } catch (err: any) {
       console.error('Error:', err)
@@ -201,3 +180,4 @@ export default function SignInPage() {
     </div>
   )
 }
+     
